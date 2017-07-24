@@ -4,7 +4,6 @@ from Move import move_list
 import random as r
 
 
-
 def gen_stats(person):
     '''
     INPUT: takes person objects stat attributes which equal 0
@@ -20,8 +19,6 @@ def gen_stats(person):
     stat_total = stat_sum(person)
     if stat_total != 45:
         gen_stats(person)
-    else:
-        return
 
 
 def stat_sum(person):
@@ -50,6 +47,17 @@ Defense: {}\n\
 Speed: {}\n\
 Luck: {}\n'.format(person.name, person.level, person.hp, person.atk, person.dfn, person.spd, person.lck))
 
+def print_name_and_hp(person):
+    """
+    INPUT: person objects and attributes
+    USAGE: to print out the object name, HP, and a health bar
+    OUTPUT: just the print statements, no return
+    """
+
+    print(person.name)
+    if person.hp < 20:
+
+    print()
 
 def attack(attacker, attackee):
     '''
@@ -84,7 +92,7 @@ def use_move(attacker, attackee, move):
         chances = 100 - (move.accuracy * 100)
 
         if r.randint(1, 100) < chances:
-            print('{} Missed!', move)
+            print('{} Missed!'.format(move))
 
         else:
             modifier = 1
@@ -94,7 +102,7 @@ def use_move(attacker, attackee, move):
             if attackee.hp < 0:
                 attackee.hp = 0
             print('{} Hit!'.format(move))
-            print(move, "did {} damage to ".format(damage), attackee)
+            print(move, "did {} damage to".format(damage), attackee)
 
 
 def print_move_stats(move):
@@ -109,16 +117,55 @@ def print_move_stats(move):
                                                                   '%', str(round(move.critrate * 100)) + '%'))
 
 
-def battle_sequence(person1, person2):
+def battle_sequence(ally, foe):
     '''
-    INPUT: two player objects
+    INPUT: two player objects (an ally and a foe)
     USAGE: to navigate through a battle sequence between the two player objects
     OUTPUT: whatever is necessary within the sequence
     '''
 
-    pass
+    print('\nEntering Battle Mode')
+
+    while foe.hp > 0 or ally.hp > 0:
+
+        # This block determines who goes first based on speed attribute
+        if ally.spd > foe.spd:
+            ally_turn = True
+        elif ally.spd == foe.spd:
+            random_selector = r.choice(["foe", "ally"])
+            if random_selector == "ally":
+                ally_turn = True
+            else:
+                ally_turn = False
+        else:
+            ally_turn = False
 
 
+        print('(a)ttack, (d)efend, (i)tem, (r)un')
+        choice_input = input(' > ')
+
+        if choice_input == 'a':
+            attack(ally, foe)
+            print_stats(ally)
+            print_stats(foe)
+
+        elif choice_input == 'd':
+            print('Defend feature soon')
+
+        elif choice_input == 'i':
+            print('item feature soon')
+
+        elif choice_input == 'r':
+            print('No running away yet')
+
+        print(foe.name + "'s turn")
+
+        use_move(foe, ally, foe.moves[1])
+
+    if ally.hp > 0:
+        print('{} has been knocked out'.format(foe.name))
+    else:
+        print("You have been knocked out MF!")
 
 def encounter_menu():
     pass
@@ -154,27 +201,7 @@ def main():
     print("Here are your opponent's stats")
     print_stats(foe1)
 
-    print('\nEntering Battle Mode')
-
-    while foe1.hp > 0:
-        print('(a)ttack, (d)efend, (i)tem, (r)un')
-        choice_input = input(' > ')
-
-        if choice_input == 'a':
-            attack(player1, foe1)
-            print_stats(player1)
-            print_stats(foe1)
-
-        elif choice_input == 'd':
-            print('Defend feature soon')
-
-        elif choice_input == 'i':
-            print('item feature soon')
-
-        elif choice_input == 'r':
-            print('No running away yet')
-
-    print('{} has been knocked out'.format(foe1.name))
-    print_stats(foe1)
+    battle_sequence(player1, foe1)
+    print("Thank you for playing!")
 
 main()
