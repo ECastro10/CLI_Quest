@@ -1,5 +1,4 @@
-from Ally import Ally
-from Foe import Foe
+from Character import Character
 from Move import move_list
 import random as r
 
@@ -11,7 +10,8 @@ def gen_stats(person):
     OUTPUT: none
     '''
 
-    person.hp = r.randint(14, 18)
+    person.maxhp = r.randint(14, 18)
+    person.hp = person.maxhp
     person.atk = r.randint(9, 11)
     person.dfn = r.randint(9, 12)
     person.spd = r.randint(5, 10)
@@ -28,7 +28,7 @@ def stat_sum(person):
     OUTPUT: none, just returns stat_total
     '''
 
-    stat_total = (person.hp + person.atk + person.dfn + person.spd + person.lck)
+    stat_total = (person.maxhp + person.atk + person.dfn + person.spd + person.lck)
     return stat_total
 
 
@@ -45,7 +45,8 @@ Health: {}\n\
 Attack: {}\n\
 Defense: {}\n\
 Speed: {}\n\
-Luck: {}\n'.format(person.name, person.level, person.hp, person.atk, person.dfn, person.spd, person.lck))
+Luck: {}\n'.format(person.name, person.level, person.maxhp, person.atk, person.dfn, person.spd, person.lck))
+
 
 def print_name_and_hp(person):
     """
@@ -54,10 +55,8 @@ def print_name_and_hp(person):
     OUTPUT: just the print statements, no return
     """
 
-    print(person.name)
-    if person.hp < 20:
+    print(person.name, person.hp_bar, "{}/{}".format(person.hp, person.maxhp) )
 
-    print()
 
 def attack(attacker, attackee):
     '''
@@ -99,8 +98,10 @@ def use_move(attacker, attackee, move):
             damage = (((2 * attacker.level + 10) / 250) * (attacker.atk / attackee.dfn) * move.power + 2) * modifier
             damage = int(round(damage, 0))
             attackee.hp -= damage
+            update_hp_bar(attackee)
             if attackee.hp < 0:
                 attackee.hp = 0
+                update_hp_bar(attackee)
             print('{} Hit!'.format(move))
             print(move, "did {} damage to".format(damage), attackee)
 
@@ -117,6 +118,71 @@ def print_move_stats(move):
                                                                   '%', str(round(move.critrate * 100)) + '%'))
 
 
+def update_hp_bar(person):
+    """
+    INPUT: self
+    USAGE: to update hp_bar
+    OUTPUT: none
+    """
+
+    current_ticks = round(person.hp/person.maxhp * 20)
+    tick_string = (current_ticks * ">") + ((20 - current_ticks) * " ")
+    person.hp_bar = [tick_string]
+
+
+def who_goes_first(player1, player2):
+    """
+    INPUT: two Character objects
+    USAGE: to determine who goes first based on speed
+    OUTPUT: the name of the character that goes first
+    """
+    # This block determines who goes first based on speed attribute
+    if player1.spd > player2.spd:
+        return player1.name
+    elif player1.spd == player2.spd:
+        random_selector = r.choice([player1.name, player2.name])
+        return random_selector
+    else:
+        return player2.name
+
+
+def simple_opponent_turn(comp, player):
+    """
+    INPUT: two character objects
+    USAGE: simple, attack-slash, opponent type
+    OUTPUT: returns True
+    """
+
+    print("\n" + comp.name + "'s turn")
+    use_move(comp, player, comp.moves[1])
+    print("\n")
+    return True
+
+
+def player_turn(player, opponent):
+    """
+    INPUT: two character objects
+    USAGE: the menuing for the user
+    OUTPUT: returns True
+    """
+
+    print('Your Turn\n(a)ttack, (d)efend, (i)tem, (r)un')
+    choice_input = input(' > ')
+
+    if choice_input == 'a':
+        attack(player, opponent)
+
+    elif choice_input == 'd':
+        print('Defend feature soon')
+
+    elif choice_input == 'i':
+        print('item feature soon')
+
+    elif choice_input == 'r':
+        print('No running away yet')
+
+    return True
+
 def battle_sequence(ally, foe):
     '''
     INPUT: two player objects (an ally and a foe)
@@ -126,49 +192,31 @@ def battle_sequence(ally, foe):
 
     print('\nEntering Battle Mode')
 
-    while foe.hp > 0 or ally.hp > 0:
+    while foe.hp != 0 or ally.hp != 0:
 
-        # This block determines who goes first based on speed attribute
-        if ally.spd > foe.spd:
-            ally_turn = True
-        elif ally.spd == foe.spd:
-            random_selector = r.choice(["foe", "ally"])
-            if random_selector == "ally":
-                ally_turn = True
-            else:
-                ally_turn = False
+        ally_played = False
+        foe_played = False
+
+        if who_goes_first(ally, foe) == ally.name:
+            played = player_turn(ally, foe)
+            print_name_and_hp(ally)
+            print_name_and_hp(foe)
         else:
-            ally_turn = False
+            simple_opponent_turn(foe, ally)
+            print_name_and_hp(ally)
+            print_name_and_hp(foe)
 
 
-        print('(a)ttack, (d)efend, (i)tem, (r)un')
-        choice_input = input(' > ')
-
-        if choice_input == 'a':
-            attack(ally, foe)
-            print_stats(ally)
-            print_stats(foe)
-
-        elif choice_input == 'd':
-            print('Defend feature soon')
-
-        elif choice_input == 'i':
-            print('item feature soon')
-
-        elif choice_input == 'r':
-            print('No running away yet')
-
-        print(foe.name + "'s turn")
-
-        use_move(foe, ally, foe.moves[1])
 
     if ally.hp > 0:
         print('{} has been knocked out'.format(foe.name))
     else:
         print("You have been knocked out MF!")
 
+
 def encounter_menu():
     pass
+
 
 def user_input():
     '''
@@ -177,8 +225,9 @@ def user_input():
     OUTPUT: returns what the user has input
     '''
 
-    user_input = input('>> ')
-    return user_input
+    u_input = input('>> ')
+    return u_input
+
 
 def main():
     '''
@@ -188,14 +237,14 @@ def main():
     '''
     # First, get user name to generate the user's character, then print stats
     print('What is your name?')
-    player1 = Ally(user_input())
+    player1 = Character(user_input())
     gen_stats(player1)
     player1.moves = move_list
     print('Here are your stats:')
     print_stats(player1)
 
     # Generate first opponenet and stats
-    foe1 = Foe('Felix')
+    foe1 = Character('Felix')
     gen_stats(foe1)
     foe1.moves = move_list
     print("Here are your opponent's stats")
