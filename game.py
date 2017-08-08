@@ -48,14 +48,16 @@ Speed: {}\n\
 Luck: {}\n'.format(person.name, person.level, person.maxhp, person.atk, person.dfn, person.spd, person.lck))
 
 
-def print_name_and_hp(person):
+def print_names_and_hps(ally, foe):
     """
     INPUT: person objects and attributes
     USAGE: to print out the object name, HP, and a health bar
     OUTPUT: just the print statements, no return
     """
-
-    print(person.name, person.hp_bar, "{}/{}".format(person.hp, person.maxhp) )
+    update_hp_bar(ally)
+    update_hp_bar(foe)
+    print(ally.name, ally.hp_bar, "{}/{}".format(ally.hp, ally.maxhp))
+    print(foe.name, foe.hp_bar, "{}/{}".format(foe.hp, foe.maxhp))
 
 
 def attack(attacker, attackee):
@@ -183,6 +185,7 @@ def player_turn(player, opponent):
 
     return True
 
+
 def battle_sequence(ally, foe):
     '''
     INPUT: two player objects (an ally and a foe)
@@ -192,30 +195,46 @@ def battle_sequence(ally, foe):
 
     print('\nEntering Battle Mode')
 
-    while foe.hp != 0 or ally.hp != 0:
-
-        ally_played = False
-        foe_played = False
+    while not knockout_checker(ally, foe):
 
         if who_goes_first(ally, foe) == ally.name:
-            played = player_turn(ally, foe)
-            print_name_and_hp(ally)
-            print_name_and_hp(foe)
+            print_names_and_hps(ally, foe)
+            player_turn(ally, foe)
+            print_names_and_hps(ally, foe)
+
+            if knockout_checker(ally, foe):
+                break
+
+            simple_opponent_turn(foe, ally)
+            if knockout_checker(ally, foe):
+                break
         else:
             simple_opponent_turn(foe, ally)
-            print_name_and_hp(ally)
-            print_name_and_hp(foe)
+            print_names_and_hps(ally, foe)
 
+            if knockout_checker(ally, foe):
+                break
+            player_turn(ally, foe)
+            print_names_and_hps(ally, foe)
 
-
-    if ally.hp > 0:
-        print('{} has been knocked out'.format(foe.name))
-    else:
-        print("You have been knocked out MF!")
+            if knockout_checker(ally, foe):
+                break
 
 
 def encounter_menu():
     pass
+
+
+def knockout_checker(ally, foe):
+    """
+    INPUT: two character objects usually an ally and a foe
+    USAGE: to determine if either objects.hp is equal to zero
+    OUTPUT: a boolean operator
+    """
+    if ally.hp == 0 or foe.hp == 0:
+        return True
+    else:
+        return False
 
 
 def user_input():
@@ -251,6 +270,10 @@ def main():
     print_stats(foe1)
 
     battle_sequence(player1, foe1)
+    if player1.hp == 0:
+        print("You got knocked the F*** Out!")
+    else:
+        print("You knocked out {}!".format(foe1.name))
     print("Thank you for playing!")
 
 main()
