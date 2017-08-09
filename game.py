@@ -3,6 +3,9 @@ from Move import move_list
 import random as r
 
 
+line = "**********************"
+
+
 def gen_stats(person):
     '''
     INPUT: takes person objects stat attributes which equal 0
@@ -39,13 +42,13 @@ def print_stats(person):
     OUTPUT: prints out name and stats
     '''
 
-    print('\nName: {}\n\
+    print('Name: {}\n\
 Level: {}\n\
 Health: {}\n\
 Attack: {}\n\
 Defense: {}\n\
 Speed: {}\n\
-Luck: {}\n'.format(person.name, person.level, person.maxhp, person.atk, person.dfn, person.spd, person.lck))
+Luck: {}'.format(person.name, person.level, person.maxhp, person.atk, person.dfn, person.spd, person.lck))
 
 
 def print_names_and_hps(ally, foe):
@@ -54,10 +57,30 @@ def print_names_and_hps(ally, foe):
     USAGE: to print out the object name, HP, and a health bar
     OUTPUT: just the print statements, no return
     """
+
     update_hp_bar(ally)
     update_hp_bar(foe)
-    print(ally.name, ally.hp_bar, "{}/{}".format(ally.hp, ally.maxhp))
-    print(foe.name, foe.hp_bar, "{}/{}".format(foe.hp, foe.maxhp))
+    regulated_name_space = ""
+
+    if len(ally.name) > len(foe.name):
+        regulated_name_space = foe.name + ((len(ally.name) - len(foe.name)) * " ")
+        print(line)
+        print(ally.name, ally.hp_bar, "{}/{}".format(ally.hp, ally.maxhp))
+        print(regulated_name_space, foe.hp_bar, "{}/{}".format(foe.hp, foe.maxhp))
+        print(line)
+
+    elif len(foe.name) > len(ally.name):
+        regulated_name_space = ally.name + ((len(ally.name) - len(foe.name)) * " ")
+        print(line)
+        print(regulated_name_space, ally.hp_bar, "{}/{}".format(ally.hp, ally.maxhp))
+        print(foe.name, foe.hp_bar, "{}/{}".format(foe.hp, foe.maxhp))
+        print(line)
+
+    else:
+        print(line)
+        print(ally.name, ally.hp_bar, "{}/{}".format(ally.hp, ally.maxhp))
+        print(foe.name, foe.hp_bar, "{}/{}".format(foe.hp, foe.maxhp))
+        print(line)
 
 
 def attack(attacker, attackee):
@@ -68,12 +91,14 @@ def attack(attacker, attackee):
     '''
 
     move_no = 0
-
+    print(line)
     for i in attacker.moves:
         print('{} {}\n'.format(move_no, i))
         move_no += 1
 
+    print(line)
     move_choice = int(input('Which move would you like to use?> '))
+    print(line)
 
     use_move(attacker, attackee, attacker.moves[move_choice])
 
@@ -255,25 +280,37 @@ def main():
     OUTPUT: whatever the game dictates
     '''
     # First, get user name to generate the user's character, then print stats
+    print(line)
     print('What is your name?')
     player1 = Character(user_input())
     gen_stats(player1)
     player1.moves = move_list
+    print(line)
     print('Here are your stats:')
     print_stats(player1)
 
-    # Generate first opponenet and stats
+    # Generate first opponent and stats
     foe1 = Character('Felix')
     gen_stats(foe1)
     foe1.moves = move_list
+    print(line)
     print("Here are your opponent's stats")
     print_stats(foe1)
+    start_battle = False
+    while not start_battle:
+        print(line)
+        init_input = input("Ready to battle? (y)es or (n)o >>> ")
+        if init_input == "y":
+            break
 
     battle_sequence(player1, foe1)
     if player1.hp == 0:
+        print(line)
         print("You got knocked the F*** Out!")
     else:
+        print(line)
         print("You knocked out {}!".format(foe1.name))
     print("Thank you for playing!")
+    print(line)
 
-main()
+# main()
