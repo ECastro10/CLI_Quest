@@ -80,7 +80,8 @@ def print_screen(ally, foe):
     USAGE: To consolidate print statements into a function that does all the printing for neatness and consistency
     OUTPUT: Just the print statements
     """
-    print("******************************/n" + print_names_and_hps(ally, foe))
+    print("\n******************************\n")
+    print_names_and_hps(ally, foe)
 
 
 def attack(attacker, attackee):
@@ -111,7 +112,6 @@ def use_move(attacker, attackee, move):
         print('not an attacking move')
 
     else:
-
         chances = 100 - (move.accuracy * 100)
 
         if r.randint(1, 100) < chances:
@@ -220,24 +220,23 @@ def battle_sequence(ally, foe):
     while not knockout_checker(ally, foe):
 
         if who_goes_first(ally, foe) == ally.name:
-            print_names_and_hps(ally, foe)
+            print_screen(ally, foe)
             player_turn(ally, foe)
-            print_names_and_hps(ally, foe)
 
             if knockout_checker(ally, foe):
                 break
-
+            print_screen(ally, foe)
             simple_opponent_turn(foe, ally)
             if knockout_checker(ally, foe):
                 break
         else:
             simple_opponent_turn(foe, ally)
-            print_names_and_hps(ally, foe)
+            print_screen(ally, foe)
 
             if knockout_checker(ally, foe):
                 break
             player_turn(ally, foe)
-            print_names_and_hps(ally, foe)
+            print_screen(ally, foe)
 
             if knockout_checker(ally, foe):
                 break
@@ -288,9 +287,10 @@ def main():
     foe1 = Character('Felix')
     gen_stats(foe1)
     foe1.moves = move_list
-    print("Here are your opponent's stats")
+    print('*****************************\n' + "Here are your opponent's stats")
     print_stats(foe1)
     start_battle = False
+
     while not start_battle:
         init_input = input("Ready to battle? (y)es or (n)o >>> ")
         if init_input == "y":
@@ -303,4 +303,4 @@ def main():
         print("You knocked out {}!".format(foe1.name))
     print("Thank you for playing!")
 
-# main()
+main()
